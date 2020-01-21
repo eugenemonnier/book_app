@@ -82,15 +82,13 @@ As a user, I want my application to load quickly so that I have an enjoyable exp
 
 ### Time Estimate
 ```
-Number and name of feature: 
+Estimate of time needed to complete: 1 hour
 
-Estimate of time needed to complete: 
+Start time: 10:05
 
-Start time: 
+Finish time: 10:50
 
-Finish time: 
-
-Actual time needed to complete: 
+Actual time needed to complete: 45 minutes
 ```
 
 ## Feature 2: *Search*
