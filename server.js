@@ -15,8 +15,17 @@ app.use(express.static('./public'));
 // setup view engine
 app.set('view engine', 'ejs');
 
+// body paraser
+app.use(express.urlencoded({extended:true}));
+
 // routes
-app.get('/hello', getHomePage);
+app.get('/', getHomePage);
+app.get('/searches/new', displaySearch);
+
+function displaySearch(request,response) {
+  // display search page
+  response.status(200).render('./pages/searches/new');
+}
 
 function getHomePage(request, response) {
   // get home page

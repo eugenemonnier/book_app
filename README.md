@@ -108,14 +108,12 @@ As a user, I want to search the Google Books API so that I can view the results 
 
 ### Time Estimate
 ```
-Number and name of feature: 
+Estimate of time needed to complete: 30 mins
 
-Estimate of time needed to complete: 
+Start time: 11:00
 
-Start time: 
+Finish time: 11:15
 
-Finish time: 
-
-Actual time needed to complete: 
+Actual time needed to complete: 15 mins
 ```
 
