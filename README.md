@@ -6,7 +6,7 @@
 
 **Author**: Andrew Kyllo & Eugene Monnier
 
-**Version**: 0.0.1
+**Version**: 0.03.01
 
   
 
@@ -43,13 +43,12 @@ This website utilizes the following packages:
 
 ## Change Log
 
-<!-- Use this area to document the iterative changes made to your application as each feature is successfully implemented. Use time stamps. Here's an examples:
+<!-- Use this area to document the iterative changes made to your application as each feature is successfully implemented. Use time stamps. Here's an examples:-->
 
-  
-
-01-21-2020 9:45am - Initial setup of file structure.
-
-  
+ - 01-21-2020 09:45 - Initial setup of file structure.
+ - 01-21-2020 10:50 - Feature 1 complete: Initial server setup
+ - 01-21-2020 11:15 - Feature 2 complete: Add search function
+ - 01-21-2020 13:15 - Feature 3 complete: Render search results
 
 ## Credits and Collaborations
 
@@ -117,3 +116,36 @@ Finish time: 11:15
 Actual time needed to complete: 15 mins
 ```
 
+## Feature 3: *Browse Results*
+As a user, I want to be able to browse the search results.
+
+### Description
+**Given** that the user enters a seach query
+**When** the user submits the search form
+**Then** the first ten books should be displayed to the user
+
+### Feature Tasks
+- [ ] Create a Book constructor function to model your data, based on the properties needed to build out the wireframes. The properties should utilize ternary operators or short circuit evaluation to include default values, in case the API does not return results for a given property.
+
+- [ ] Prevent mixed content warnings. Resource URLs returned by the API that are unsecure should be converted to use a secure protocol when the data is processed in the Book constructor.
+
+- [ ] Install and require the superagent package from NPM; validate that it's listed as a dependency in your package.json.
+
+- [ ] Add a route handler for a POST request to /searches. This route's callback will use Superagent to proxy a request to the Google Books API and return a list of ten books that match the search query.
+
+- [ ] Map over the array of results, creating a new Book instance from each result object.
+
+- [ ] Render the newly constructed array of objects in a new view, such as searches/show. Ensure each book is displayed with all the properties included in the wireframe.
+
+- [ ] Make a PR to master and confirm functionality on your deployed site.
+
+### Time Estimate
+```
+Estimate of time needed to complete: 1 hour
+
+Start time: 12:00
+
+Finish time: 13:15
+
+Actual time needed to complete: 1 hour 15 minutes
+```
