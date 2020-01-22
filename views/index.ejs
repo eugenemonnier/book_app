@@ -5,7 +5,18 @@
   <title>Document</title>
 </head>
 <body>
-  <header>Hello friend</header>
+  <h1>Your Book Collection</h1>
+  <div>
+    <% results.forEach(obj => { %>
+      <div>
+          <img src=<%= obj.img_url %> alt= <%= obj.title %>>
+          <h2><%= obj.title %></h2>
+          <p>Author: <%= obj.authors %></p>
+          <p><%= obj.book_description %></p>
+      </div>
+    <% }) %>
+    <h4>Number Of Books In Your Collection: <%= results.length %></h4>
+  </div>
   
 </body>
 </html>
