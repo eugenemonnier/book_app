@@ -5,6 +5,12 @@ const express = require('express');
 require('dotenv').config();
 const superagent = require('superagent');
 require('ejs');
+const pg = require('pg');
+
+// Database setup
+const client = new pg.Client(process.env.DATABASE_URL);
+client.connect();
+client.on('error', error => console.errorHandler(error));
 
 // global variables
 const app = express();
@@ -32,7 +38,13 @@ function displaySearch(request,response) {
 
 function getHomePage(request, response) {
   // get home page
-  response.status(200).render('index');
+  let sql = 'SELECT * FROM books;';
+  return client.query(sql)
+    .then(results => {
+      console.log(results);
+      response.render('index', {results: results.rows});
+    })
+    .catch(errorHandler);
 }
 
 function bookData(request, response) {
@@ -44,7 +56,11 @@ function bookData(request, response) {
     superagent.get(url)
       .then (agentResults => {
         let bookArray = agentResults.body.items;
-        const betterBookArray = bookArray.map(book => new Book(book.volumeInfo));
+        const betterBookArray = bookArray.map(book => {
+          const currentBook = new Book(book.volumeInfo);
+          storeBooks(currentBook);
+          return currentBook;
+        });
         response.status(200).render('./pages/searches/show.ejs', {books: betterBookArray});
       });
   }
@@ -52,6 +68,12 @@ function bookData(request, response) {
     errorHandler(error, request, response);
   }
 }
+
+const storeBooks = (currentBook => {
+  let safeValues = [currentBook.title, currentBook.authors, currentBook.description, currentBook.bookImage];
+  let sql = 'INSERT INTO books (title, authors, book_description, img_url) VALUES ($1, $2, $3, $4);';
+  client.query(sql, safeValues);
+});
 
 function Book(info) {
   info.imageLinks !== undefined ? this.bookImage = info.imageLinks.thumbnail.replace('http:', 'https:') : this.bookImage = 'https://cdn3-www.comingsoon.net/assets/uploads/2018/08/conair.jpg';
