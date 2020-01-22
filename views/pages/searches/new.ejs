@@ -2,9 +2,16 @@
 <html lang="en">
 <head>
   <title>Book Collection</title>
+  <link href="/styles/reset.css" type="text/css" rel="stylesheet" />
+  <link href="/styles/base.css" type="text/css" rel="stylesheet" />
+  <link href="/styles/layout.css" type="text/css" rel="stylesheet" />
 </head>
 <body>
+  <header>
+    Best Books!
+  </header>
   <main>
+    <h2>Search by Title or Author</h2>
     <form action="/searches/new" method="POST">
       <input type="text" name="search" placeholder="Enter a tilte or author" required>
       <fieldset>

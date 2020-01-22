@@ -1,4 +1,71 @@
 body {
-  background-color: #777;
+  background-color: #999;
   font-size: 40px;
+  font-family: Helvetica, sans-serif;
+}
+
+header {
+  background-color: #000;
+  color: #ddd;
+  font-size: 50px;
+  padding: 60px 20px;
+}
+h2 {
+  background-color: #444;
+  color: #eee;
+  text-align: center;
+  font-size: 40px;
+  padding: 40px 0;
+}
+
+button {
+  border: none;
+  background-color: #000;
+  color: #ddd;
+  padding: 20px 50px;
+  font-size: 37px;
+}
+
+form {
+  display: grid;
+  margin-top: 75px;
+  grid-template-rows: 127px 127px 127px 127px;
+  grid-row-gap: 53px;
+}
+
+label {
+  /* display: flex;
+  flex-direction: row;
+  align-items: center; */
+  /* align-items: center; */
+  /* grid-row: 20% 80%; */
+}
+
+fieldset {
+  background-color: #cfcfcf;
+  /* margin: 0px 100px; */
+}
+span {
+  display: inline-block;
+  margin-left: 40px;
+}
+input, button, fieldset {
+  margin: 0px 100px;
+  border-radius: 10px;
+}
+input::placeholder {
+  padding-left: 30px;
+  font-size: 40px;
+  color: #000;
+}
+
+input[type=radio] {
+  display: inline-block;
+  height: 40px;
+  width: 3%;
+  margin: 45px 250px 0 0;
+}
+input[value=title]
+{
+  margin-left: 20px;
 }
