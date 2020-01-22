@@ -36,26 +36,39 @@ function getHomePage(request, response) {
 }
 
 function bookData(request, response) {
-  let searchWord = request.body.search[0];
-  let searchType = request.body.search[1];
-
-  let url = `https://www.googleapis.com/books/v1/volumes?q=`;
-
-  searchType === 'title' ? url += `+intitle:${searchWord}` : url += `+inauthor:${searchWord}`;
-
-  superagent.get(url)
-    .then (agentResults => {
-      let bookArray = agentResults.body.items;
-      const betterBookArray = bookArray.map(book => new Book(book.volumeInfo));
-      response.status(200).render('./pages/searches/show.ejs', {books: betterBookArray});
-    });
+  try {
+    let searchWord = request.body.search[0];
+    let searchType = request.body.search[1];
+    let url = `https://www.googleapis.com/books/v1/volumes?q=`;
+    searchType === 'title' ? url += `+intitle:${searchWord}` : url += `+inauthor:${searchWord}`;
+    superagent.get(url)
+      .then (agentResults => {
+        let bookArray = agentResults.body.items;
+        const betterBookArray = bookArray.map(book => new Book(book.volumeInfo));
+        response.status(200).render('./pages/searches/show.ejs', {books: betterBookArray});
+      });
+  }
+  catch(error) {
+    errorHandler(error, request, response);
+  }
 }
 
 function Book(info) {
-  info.imageLinks !== undefined ? this.bookImage = info.imageLinks.thumbnail.replace('http:', 'https:') : this.bookImage = 'https://i.imgur.com/J5LVHEL.jpg';
+  info.imageLinks !== undefined ? this.bookImage = info.imageLinks.thumbnail.replace('http:', 'https:') : this.bookImage = 'https://cdn3-www.comingsoon.net/assets/uploads/2018/08/conair.jpg';
   info.title !== undefined ? this.title = info.title : this.title = 'no title available';
   info.authors !== undefined ? this.authors = info.authors.toString(', ') : this.authors = 'no author available';
   info.description !== undefined ? this.description = info.description : this.description = 'no description available';
+}
+
+// error handler
+function errorHandler(error, request, response) {
+  const errorObject = {
+    errorMsg: 'robert messed up again!',
+    error: error,
+    request: request,
+    response: response
+  }
+  response.status(500).render('./pages/error.ejs', {errors: errorObject});
 }
 
 app.listen(PORT, () => console.log(`Listening on ${PORT}`));
