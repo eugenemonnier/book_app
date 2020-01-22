@@ -1,0 +1,18 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <link href="styles/base.css" type="text/css" rel="stylesheet" />
+  <title>Document</title>
+</head>
+<body>
+  <h1>Book Details</h1>
+  <div class="book-details container">
+      <div class="book" data-id="<%= selectedBook.id" %>>
+          <img src=<%= selectedBook.img_url %> alt= <%= selectedBook.title %>>
+          <h2><%= selectedBook.title %></h2>
+          <p>Author: <%= selectedBook.authors %></p>
+          <p><%= selectedBook.book_description %></p>
+      </div>
+  </div>  
+</body>
+</html>
