@@ -30,6 +30,7 @@ app.use(express.urlencoded({extended:true}));
 app.get('/', getHomePage);
 app.get('/searches/new', displaySearch);
 app.post('/searches/new', bookData);
+app.get('/books/:book_id', getBook);
 
 function displaySearch(request,response) {
   // display search page
@@ -41,7 +42,6 @@ function getHomePage(request, response) {
   let sql = 'SELECT * FROM books;';
   return client.query(sql)
     .then(results => {
-      console.log(results);
       response.render('index', {results: results.rows});
     })
     .catch(errorHandler);
@@ -71,8 +71,15 @@ function bookData(request, response) {
 
 const storeBooks = (currentBook => {
   let safeValues = [currentBook.title, currentBook.authors, currentBook.description, currentBook.bookImage];
-  let sql = 'INSERT INTO books (title, authors, book_description, img_url) VALUES ($1, $2, $3, $4);';
-  client.query(sql, safeValues);
+  let sql = 'INSERT INTO books (title, authors, book_description, img_url) VALUES ($1, $2, $3, $4) RETURNING id;';
+  client.query(sql, safeValues)
+    .then(result => {
+      currentBook['id'] = result.rows[0].id;
+      console.log('inside the then', currentBook.id);
+      return currentBook.id;
+    });
+    console.log('inside the query', results.rows[0].id);
+    return currentBook.id;
 });
 
 function Book(info) {
@@ -82,6 +89,16 @@ function Book(info) {
   info.description !== undefined ? this.description = info.description : this.description = 'no description available';
 }
 
+function getBook(request, response) {
+  let sql = 'SELECT * FROM books WHERE id=$1;';
+  let values = [request.params.book_id];
+  console.log(values);
+  return client.query(sql, values)
+    .then(results => {
+      return response.render('pages/books/details', {selectedBook: results.rows[0]});
+    })
+    .catch(error => errorHandler(error, request, response));
+}
 // error handler
 function errorHandler(error, request, response) {
   const errorObject = {
