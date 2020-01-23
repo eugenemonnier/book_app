@@ -53,14 +53,14 @@ function bookData(request, response) {
     let searchType = request.body.search[1];
     let url = `https://www.googleapis.com/books/v1/volumes?q=`;
     searchType === 'title' ? url += `+intitle:${searchWord}` : url += `+inauthor:${searchWord}`;
-    superagent.get(url)
+    return superagent.get(url)
       .then (agentResults => {
         let bookArray = agentResults.body.items;
         const betterBookArray = bookArray.map(book => {
           const currentBook = new Book(book.volumeInfo);
           storeBooks(currentBook)
-            .then(results => console.log('results: ', results));
-          return currentBook;
+            .then(results => {console.log('results: ', results)});
+          return currentBook.id;
         });
         response.status(200).render('./pages/searches/show.ejs', {books: betterBookArray});
       });
@@ -76,7 +76,6 @@ const storeBooks = (currentBook => {
   return client.query(sql, safeValues)
     .then(result => {
       currentBook['id'] = result.rows[0].id;
-      console.log('inside the then', currentBook.id);
       return currentBook.id;
     })
     .catch((error) => errorHandler(error));
