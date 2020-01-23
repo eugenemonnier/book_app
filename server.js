@@ -56,12 +56,7 @@ function bookData(request, response) {
     return superagent.get(url)
       .then (agentResults => {
         let bookArray = agentResults.body.items;
-        const betterBookArray = bookArray.map(book => {
-          const currentBook = new Book(book.volumeInfo);
-          storeBooks(currentBook)
-            .then(results => {console.log('results: ', results)});
-          return currentBook.id;
-        });
+        const betterBookArray = bookArray.map((book, index) => new Book(book.volumeInfo, index));
         response.status(200).render('./pages/searches/show.ejs', {books: betterBookArray});
       });
   }
@@ -70,22 +65,25 @@ function bookData(request, response) {
   }
 }
 
-const storeBooks = (currentBook => {
-  let safeValues = [currentBook.title, currentBook.authors, currentBook.description, currentBook.bookImage];
-  let sql = 'INSERT INTO books (title, authors, book_description, img_url) VALUES ($1, $2, $3, $4) RETURNING id;';
-  return client.query(sql, safeValues)
-    .then(result => {
-      currentBook['id'] = result.rows[0].id;
-      return currentBook.id;
-    })
-    .catch((error) => errorHandler(error));
-});
+// const storeBooks = (currentBook => {
+//   let safeValues = [currentBook.title, currentBook.authors, currentBook.description, currentBook.bookImage];
+//   let sql = 'INSERT INTO books (title, authors, book_description, img_url) VALUES ($1, $2, $3, $4) RETURNING id;';
+//   return client.query(sql, safeValues)
+//     .then(result => {
+//       currentBook['id'] = result.rows[0].id;
+//       return currentBook.id;
+//     })
+//     .catch((error) => errorHandler(error));
+// });
 
-function Book(info) {
+function Book(info, index) {
+  console.log('book info: ', info);
+  console.log('index: ', index);
   info.imageLinks !== undefined ? this.bookImage = info.imageLinks.thumbnail.replace('http:', 'https:') : this.bookImage = 'https://cdn3-www.comingsoon.net/assets/uploads/2018/08/conair.jpg';
   info.title !== undefined ? this.title = info.title : this.title = 'no title available';
   info.authors !== undefined ? this.authors = info.authors.toString(', ') : this.authors = 'no author available';
   info.description !== undefined ? this.description = info.description : this.description = 'no description available';
+  this.id = index;
 }
 
 function getBook(request, response) {
