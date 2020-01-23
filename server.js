@@ -58,7 +58,8 @@ function bookData(request, response) {
         let bookArray = agentResults.body.items;
         const betterBookArray = bookArray.map(book => {
           const currentBook = new Book(book.volumeInfo);
-          storeBooks(currentBook);
+          storeBooks(currentBook)
+            .then(results => console.log('results: ', results));
           return currentBook;
         });
         response.status(200).render('./pages/searches/show.ejs', {books: betterBookArray});
@@ -72,14 +73,13 @@ function bookData(request, response) {
 const storeBooks = (currentBook => {
   let safeValues = [currentBook.title, currentBook.authors, currentBook.description, currentBook.bookImage];
   let sql = 'INSERT INTO books (title, authors, book_description, img_url) VALUES ($1, $2, $3, $4) RETURNING id;';
-  client.query(sql, safeValues)
+  return client.query(sql, safeValues)
     .then(result => {
       currentBook['id'] = result.rows[0].id;
       console.log('inside the then', currentBook.id);
       return currentBook.id;
-    });
-    console.log('inside the query', results.rows[0].id);
-    return currentBook.id;
+    })
+    .catch((error) => errorHandler(error));
 });
 
 function Book(info) {
