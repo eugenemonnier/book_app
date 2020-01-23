@@ -8,11 +8,19 @@
   <div>
     <% books.forEach(obj => { %>
       <div class="book" data-id="book_<%= obj.id %>" >
-          <img src=<%= obj.bookImage %> alt= <%= obj.title %>>
-          <h2><%= obj.title %></h2>
-          <p>Author: <%= obj.authors %></p>
-          <p><%= obj.id %></p>
-          <a href="/books/<%= obj.id %>">View Details</a>
+        <img src="<%= obj.bookImage %>">
+        <h2><%= obj.title %></h2>
+        <p>Author: <%= obj.authors %></p>
+        <p>ID: <%= obj.identifier %></p>
+        <p><%= obj.description %></p>
+        <form action="/books/<%= obj.id %>" method="POST" name="<%= obj.id %>">
+          <input type="hidden" name="bookImage" value="<%= obj.bookImage %>">
+            <input type="hidden" name="title" value="<%=obj.title%>">
+            <input type="hidden" name="authors" value="<%=obj.authors%>">
+            <input type="hidden" name="description" value="<%=obj.description%>" >
+            <input type="hidden" name="identifier" value="<%=obj.identifier%>" >
+            <button type="submit">Add to Database</button>
+          </form>
       </div>
     <% }) %>
   </div>

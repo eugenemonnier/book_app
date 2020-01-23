@@ -30,11 +30,25 @@ app.use(express.urlencoded({extended:true}));
 app.get('/', getHomePage);
 app.get('/searches/new', displaySearch);
 app.post('/searches/new', bookData);
-app.get('/books/:book_id', getBook);
+app.post('/books/:book_id', storeBook);
+app.get('/books/details/:book_id', getBook);
 
 function displaySearch(request,response) {
   // display search page
   response.status(200).render('./pages/searches/new');
+}
+
+function getBook(request, response) {
+  // console.log('results: ',request.params.book_id);
+  let sql = 'SELECT * FROM books WHERE id=$1;';
+  let values = [request.params.book_id];
+  return client.query(sql, values)
+    .then(results => {
+      console.log('results: ', results.rows[0].title);
+      let bookResults = results.rows[0];
+      response.status(200).render('./pages/books/details.ejs', {selectedBook: bookResults});
+    })
+    .catch(error => errorHandler(error, request, response));
 }
 
 function getHomePage(request, response) {
@@ -53,14 +67,11 @@ function bookData(request, response) {
     let searchType = request.body.search[1];
     let url = `https://www.googleapis.com/books/v1/volumes?q=`;
     searchType === 'title' ? url += `+intitle:${searchWord}` : url += `+inauthor:${searchWord}`;
-    superagent.get(url)
+    return superagent.get(url)
       .then (agentResults => {
         let bookArray = agentResults.body.items;
-        const betterBookArray = bookArray.map(book => {
-          const currentBook = new Book(book.volumeInfo);
-          storeBooks(currentBook);
-          return currentBook;
-        });
+        const betterBookArray = bookArray.map((book, index) => new Book(book.volumeInfo, index));
+
         response.status(200).render('./pages/searches/show.ejs', {books: betterBookArray});
       });
   }
@@ -69,36 +80,25 @@ function bookData(request, response) {
   }
 }
 
-const storeBooks = (currentBook => {
-  let safeValues = [currentBook.title, currentBook.authors, currentBook.description, currentBook.bookImage];
-  let sql = 'INSERT INTO books (title, authors, book_description, img_url) VALUES ($1, $2, $3, $4) RETURNING id;';
-  client.query(sql, safeValues)
-    .then(result => {
-      currentBook['id'] = result.rows[0].id;
-      console.log('inside the then', currentBook.id);
-      return currentBook.id;
-    });
-    console.log('inside the query', results.rows[0].id);
-    return currentBook.id;
-});
-
-function Book(info) {
+function storeBook(request, response) {
+  let {bookImage, title, authors, description, identifier} = request.body;
+  const safeWords = [bookImage, title, authors, description, identifier];
+  // console.log('Safe Words: ', safeWords);
+  let SQL = 'INSERT INTO books(img_url, title, authors, book_description, identifier) VALUES ($1, $2, $3, $4, $5) RETURNING id;';
+  client.query(SQL , safeWords)
+    .then(results => response.status(200).redirect(`/books/details/${results.rows[0].id}`))
+    .catch((error) => errorHandler(error, request, response));
+}
+//
+function Book(info, index) {
   info.imageLinks !== undefined ? this.bookImage = info.imageLinks.thumbnail.replace('http:', 'https:') : this.bookImage = 'https://cdn3-www.comingsoon.net/assets/uploads/2018/08/conair.jpg';
   info.title !== undefined ? this.title = info.title : this.title = 'no title available';
   info.authors !== undefined ? this.authors = info.authors.toString(', ') : this.authors = 'no author available';
   info.description !== undefined ? this.description = info.description : this.description = 'no description available';
+  this.id = index;
+  this.identifier = info.industryIdentifiers[0].identifier;
 }
 
-function getBook(request, response) {
-  let sql = 'SELECT * FROM books WHERE id=$1;';
-  let values = [request.params.book_id];
-  console.log(values);
-  return client.query(sql, values)
-    .then(results => {
-      return response.render('pages/books/details', {selectedBook: results.rows[0]});
-    })
-    .catch(error => errorHandler(error, request, response));
-}
 // error handler
 function errorHandler(error, request, response) {
   const errorObject = {
