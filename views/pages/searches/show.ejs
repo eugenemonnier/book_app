@@ -7,7 +7,7 @@
   <h1>Search Results</h1>
   <div>
     <% books.forEach(obj => { %>
-      <div class="book" data-id="book_<%= obj.id %>" >
+      <div class="book" data-id="<%= obj.id %>" >
           <img src=<%= obj.bookImage %> alt= <%= obj.title %>>
           <h2><%= obj.title %></h2>
           <p>Author: <%= obj.authors %></p>

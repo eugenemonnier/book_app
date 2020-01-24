@@ -5,5 +5,6 @@ CREATE TABLE books (
   title VARCHAR(255),
   authors VARCHAR(255),
   book_description VARCHAR,
-  img_url VARCHAR(255)
+  img_url VARCHAR(255),
+  search VARCHAR(255)
 );

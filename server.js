@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-expressions */
 'use strict';
 
 // dependencies
@@ -51,28 +52,59 @@ function bookData(request, response) {
   try {
     let searchWord = request.body.search[0];
     let searchType = request.body.search[1];
+    let addOnURL;
     let url = `https://www.googleapis.com/books/v1/volumes?q=`;
-    searchType === 'title' ? url += `+intitle:${searchWord}` : url += `+inauthor:${searchWord}`;
+    searchType === 'title' ? addOnURL = `+intitle:${searchWord}` : addOnURL `+inauthor:${searchWord}`;
+    url += addOnURL;
     return superagent.get(url)
       .then (agentResults => {
         let bookArray = agentResults.body.items;
-        const betterBookArray = bookArray.map(book => {
-          const currentBook = new Book(book.volumeInfo);
-          storeBooks(currentBook)
-            .then(results => {console.log('results: ', results)});
-          return currentBook.id;
+        // console.log(agentResults.request.url);
+        bookArray.map(book => {
+          let newBook = new Book(book.volumeInfo);
+          // let searchString = agentResults.request.url.substring(46);
+          // let seaStr = searchString.subString(45);
+          newBook['searchUrl'] = addOnURL;
+          console.log(newBook);
+          storeBooks(newBook);
+          return newBook;
         });
-        response.status(200).render('./pages/searches/show.ejs', {books: betterBookArray});
+        getBooks(addOnURL,response);
       });
+
+        // betterBookArray.forEach((book, index) => {
+      //       .then(results => {betterBookArray[index]['id'] = results;
+      //       resolve(betterBookArray[index]['id']);
+      //     });
+      //     console.log(betterBookArray[index]['id']);
+      //   });
+      //   response.status(200).render('./pages/searches/show.ejs', {books: betterBookArray,});
+      // });
+    // .catch((error) => errorHandler(error));
+    // response.status(200).render('./pages/searches/show.ejs', {books: currentBook,});
+
+    // return currentBook.id;
+    // });
+
+    // .catch((error) => errorHandler(error));
   }
   catch(error) {
     errorHandler(error, request, response);
   }
 }
 
+const getBooks = ((addOnURL, response) => {
+  let sql = 'SELECT * FROM books WHERE search =$1;';
+  let safe = [addOnURL];
+  client.query(sql,safe)
+    .then (results => {
+      response.status(200).render('./pages/searches/show.ejs', {books: results,});
+    });
+});
+
 const storeBooks = (currentBook => {
-  let safeValues = [currentBook.title, currentBook.authors, currentBook.description, currentBook.bookImage];
-  let sql = 'INSERT INTO books (title, authors, book_description, img_url) VALUES ($1, $2, $3, $4) RETURNING id;';
+  let safeValues = [currentBook.title, currentBook.authors, currentBook.description, currentBook.bookImage, currentBook.searchUrl];
+  let sql = 'INSERT INTO books (title, authors, book_description, img_url, search) VALUES ($1, $2, $3, $4, $5) RETURNING id;';
   return client.query(sql, safeValues)
     .then(result => {
       currentBook['id'] = result.rows[0].id;
@@ -105,7 +137,7 @@ function errorHandler(error, request, response) {
     error: error,
     request: request,
     response: response
-  }
+  };
   response.status(500).render('./pages/error.ejs', {errors: errorObject});
 }
 
